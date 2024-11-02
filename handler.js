@@ -47,7 +47,7 @@ exports.html2pdf = async (event) => {
         "Content-Type": "application/pdf",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "POST",
-        "Access-Control-Request-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type",
       },
       body: pdfBuffer.toString("base64"),
       isBase64Encoded: true,
