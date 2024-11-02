@@ -24,14 +24,9 @@ exports.html2pdf = async (event) => {
       waitUntil: "networkidle0",
     });
 
-    let options = {
-      printBackground: true,
-      format: "A4",
-    };
-
+    let options = {};
     if (pdfOptions) {
       options = {
-        ...options,
         ...pdfOptions,
       };
     }
