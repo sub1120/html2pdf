@@ -4,7 +4,7 @@ const puppeteer = require("puppeteer-core");
 exports.html2pdf = async (event) => {
   console.info("event", event)
   
-  const { html, pdfOptions } = event.body ? JSON.parse(Buffer.from(event.body, "base64").toString()) : {};
+  const { html="<h1>Hello from pdf</h1>", pdfOptions={} } = JSON.parse(Buffer.from(event.body, "base64").toString());
 
   console.info("html", html);
   console.info("pdfOptions", pdfOptions);
@@ -20,7 +20,7 @@ exports.html2pdf = async (event) => {
 
     const page = await browser.newPage();
 
-    await page.setContent(html || `<h1>Hello from pdf</h1>`, {
+    await page.setContent(html, {
       waitUntil:"networkidle0"
     });
     
@@ -36,6 +36,8 @@ exports.html2pdf = async (event) => {
       statusCode: 200,
       headers: {
         "Content-Type": "application/pdf",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST"
       },
       body: pdfBuffer.toString('base64'),
       isBase64Encoded: true,
