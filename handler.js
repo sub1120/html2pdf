@@ -2,9 +2,9 @@ const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-core");
 
 exports.html2pdf = async (event) => {
-  console.info("event", event)
-  
-  const { html="<h1>Hello from pdf</h1>", pdfOptions={} } = JSON.parse(Buffer.from(event.body, "base64").toString());
+  console.info("event", event);
+
+  const { html, pdfOptions } = event.body ? JSON.parse(event.body) : {};
 
   console.info("html", html);
   console.info("pdfOptions", pdfOptions);
@@ -20,12 +20,21 @@ exports.html2pdf = async (event) => {
 
     const page = await browser.newPage();
 
-    await page.setContent(html, {
-      waitUntil:"networkidle0"
+    await page.setContent(html ?? "Hello from html2pdf", {
+      waitUntil: "networkidle0",
     });
-    
-    const defaultPdfOptions = { printBackground: true, format: 'A4' };
-    const options = { ...defaultPdfOptions, ...pdfOptions };
+
+    let options = {
+      printBackground: true,
+      format: "A4",
+    };
+
+    if (pdfOptions) {
+      options = {
+        ...options,
+        ...pdfOptions,
+      };
+    }
 
     const pdfBuffer = await page.pdf(options);
     console.info("pdfBuffer", pdfBuffer);
@@ -37,14 +46,13 @@ exports.html2pdf = async (event) => {
       headers: {
         "Content-Type": "application/pdf",
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST"
+        "Access-Control-Allow-Methods": "POST",
       },
-      body: pdfBuffer.toString('base64'),
+      body: pdfBuffer.toString("base64"),
       isBase64Encoded: true,
     };
-
   } catch (err) {
-    console.error(err)
+    console.error(err);
     return {
       statusCode: 400,
       body: JSON.stringify(err),
